@@ -1,18 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.js"
+    integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+    crossorigin="anonymous"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Homework 1</title>
+    <title>Document</title>
 </head>
-
-<h1>Homework 1</h1>
-
 <body>
+    <script>
+    $(document).on("click","#searchBtn", function() {
+        event.preventDefault();
 
-    <a href="https://placeholder.com"><img src="http://via.placeholder.com/350x150"></a>"
+        var searchInput = $("#searchInput").val().trim();
+        var location = $("#location").val().trim();
+        var radius = $("#radius").val().trim();
 
+        var queryURL = "https://www.eventbriteapi.com/v3/events/search/?token=NFYIPZGRL3ENLJ7TMLZJ&q=" + searchInput + "&location.address=" + location + "&location.within=" + radius;
+    
+        $.ajax({
+            url: queryURL,
+            method: "GET"
+        }).then(function(response) {
+            console.log(response)
+            
+            
+            var results = response.events;
+            
+            for (var i = 0; i < results.length; i++) {
+
+                $("#object").append(response.events[i].venue_id);
+                $("#object").append(response.events[i].description.text);
+                $("#object").append(response.events[i].url);
+
+                var venueID = response.events[i].venue_id;
+                var venuesQueryURL = 'https://www.eventbriteapi.com/v3/venues/' + venueID + '/?token=NFYIPZGRL3ENLJ7TMLZJ';
+                
+                $.ajax({
+                    url: venuesQueryURL,
+                    method : 'GET'
+                }).then(function(response) {
+                    
+                    var venueAddress = response.address.localized_address_display;
+                    var latitude = response.address.latitude;
+                    var longitude = response.address.longitude;
+
+                    $("#addresses").append(venueAddress);
+
+                    console.log(venueAddress);
+                    
+                })
+
+            }
+
+        });
+    });
+    </script>
+
+    <div id="object">
+
+    </div>
+
+    <div id="addresses">
+
+    </div>
+
+    <div class="form-group">
+        <label for="searchInput">Search Any Topic</label>
+        <input type="text" class="form-control" id="searchInput">
+        <label for="location">Address</label>
+        <input type="text" class="form-control" id="location">
+        <label for="radius">Radius</label>
+        <input type="text" class="form-control" id="radius">
+        <button type="submit" id="searchBtn" class="btn btn-dark">Submit</button>
+    </div> 
     
 </body>
 </html>
